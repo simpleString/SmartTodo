@@ -61,7 +61,7 @@ const auth: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     return await usersService.createUser(request.body);
   })
 
-  fastify.get('/user',{schema: {tags: ["WithoutToken"], response: {200 : UserResponseDto}},onRequest: [fastify.authenticate]},async (request, reply) => {
+  fastify.get('/user',{schema: {tags: ["WithToken"], response: {200 : UserResponseDto}},onRequest: [fastify.authenticate]},async (request, reply) => {
     return await usersService.getUserInfoById(request.user.id);
   })
 
