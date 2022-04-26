@@ -4,6 +4,11 @@ import { Prisma, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient()
 
 class UserService {
+    constructor() {
+        console.log("userService created");
+        
+    }
+
     public async createUser(userData: Prisma.UserCreateInput) {
         return await prisma.user.create({data: userData});
     }
@@ -28,6 +33,11 @@ class UserService {
 
     public async getUserInfoById(id: string) {
         return await prisma.user.findUnique({where: {id}})
+    }
+
+    public test() {
+        console.log("hello from user test");
+        
     }
 
 }
