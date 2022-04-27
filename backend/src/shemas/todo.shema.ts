@@ -12,23 +12,25 @@ export const TagResponseShema = Type.Object({
 
 export const TagResponseShemaArray = Type.Array(TagResponseShema);
 
-export const TodoShema = Type.Object({
+export const ItemShema = Type.Object({
   content: Type.String(),
   done: Type.Boolean({ default: false }),
 });
 
-export const TodoObjectShema = Type.Object({
+export const TodoShema = Type.Object({
   title: Type.String(),
-  todos: Type.Optional(Type.Array(TodoShema)),
-  tags: Type.Optional(Type.Array(TagShema)),
+  // todos: Type.Optional(Type.Array(ItemShema)),
+  // tags: Type.Optional(Type.Array(TagShema)),
 });
 
-export const TodoObjectResponseShema = Type.Object({
+export const TodoResponseShema = Type.Object({
   id: Type.String({ format: "uuid" }),
   title: Type.String(),
-  todos: Type.Optional(Type.Array(TodoShema)),
-  tags: Type.Optional(Type.Array(TagShema)),
+  updatedAt: Type.String({ format: "date-time" }),
   achived: Type.Optional(Type.String({ format: "date-time" })),
+  tags: Type.Array(Type.Object({ id: Type.String(), name: Type.String() })),
 });
 
-export const TodoObjectShemaArray = Type.Array(TodoObjectShema);
+export const TodoResponseShemaArray = Type.Array(TodoResponseShema);
+
+export const TodoShemaArray = Type.Array(TodoShema);

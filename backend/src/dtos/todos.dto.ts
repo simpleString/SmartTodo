@@ -2,18 +2,18 @@ import { Static } from "@sinclair/typebox";
 import {
   TagShema,
   TagResponseShema,
-  TodoObjectShema,
-  TodoObjectResponseShema,
+  TodoShema,
+  TodoResponseShema,
 } from "../shemas/todo.shema";
 
-export type TodoObjectDtoWithUser = TodoObjectDto & { userId: string };
-export type TodoObjectResponseDtoWithUser = Static<
-  typeof TodoObjectResponseShema
-> & { userId: string };
+export type TodoDtoWithUser = TodoDto & { userId: string };
+export type TodoResponseDtoWithUser = Static<typeof TodoResponseShema> & {
+  userId: string;
+};
 
-export type TodoObjectResponseDto = Static<typeof TodoObjectResponseShema>;
+export type TodoResponseDto = Static<typeof TodoResponseShema>;
 
-export type TodoObjectDto = Static<typeof TodoObjectShema>;
+export type TodoDto = Static<typeof TodoShema>;
 export type TagDto = Static<typeof TagShema>;
 
 export type TagResponseDto = Static<typeof TagResponseShema>;

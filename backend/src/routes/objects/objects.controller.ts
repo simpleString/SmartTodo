@@ -1,12 +1,12 @@
 import { FastifyPluginAsync } from "fastify";
 import { ParamsIdDto } from "../../dtos/common.dto";
-import { TodoObjectDto, TodoObjectResponseDto } from "../../dtos/todos.dto";
+import { TodoDto, TodoResponseDto } from "../../dtos/todos.dto";
 import todoService from "../../services/Todo.service";
 import { ParamsIdShema } from "../../shemas/common.shema";
 import {
   TagResponseShema,
-  TodoObjectResponseShema,
-  TodoObjectShema,
+  TodoResponseShema,
+  TodoShema,
 } from "../../shemas/todo.shema";
 
 const objects: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
@@ -27,24 +27,24 @@ const objects: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       },
     },
     async (request, reply) => {
-      return todoService.getAllTodoObjects(request.user.id);
+      // return todoService.getAllItems(request.user.id);
     }
   );
 
-  fastify.post<{ Body: TodoObjectDto }>(
+  fastify.post<{ Body: TodoDto }>(
     "/",
     {
       schema: {
-        body: TodoObjectShema,
+        body: TodoShema,
         // response: { 200: TodoObjectResponseDto }, //TODO:: Adjust for response. Not return all data right now!!!
         tags: ["objects"],
       },
     },
     async (request, reply) => {
-      return todoService.createTodoObject({
-        userId: request.user.id,
-        ...request.body,
-      });
+      // return todoService.createTodoObject({
+      //   userId: request.user.id,
+      //   ...request.body,
+      // });
     }
   );
 
@@ -52,7 +52,7 @@ const objects: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     "/:id",
     {
       schema: {
-        response: { 200: TodoObjectResponseShema },
+        response: { 200: TodoResponseShema },
         params: ParamsIdShema,
         tags: ["objects"],
       },
@@ -62,12 +62,12 @@ const objects: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   );
 
-  fastify.put<{ Params: ParamsIdDto; Body: TodoObjectResponseDto }>(
+  fastify.put<{ Params: ParamsIdDto; Body: TodoResponseDto }>(
     "/:id",
     {
       schema: {
-        response: { 200: TodoObjectResponseShema },
-        body: TodoObjectShema,
+        response: { 200: TodoResponseShema },
+        body: TodoShema,
         params: ParamsIdShema,
         tags: ["objects"],
       },

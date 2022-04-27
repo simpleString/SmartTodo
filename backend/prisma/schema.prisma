@@ -15,25 +15,26 @@ model User {
   id String @id @default(uuid())
   username String @unique
   password String
-  todoObjects TodoObject[]
-  tags Tag[]
-}
-
-model TodoObject {
-  id String @id @default(uuid())
-  title String
-  todos Todo[]
-  user User @relation(fields: [userId], references: [id])
-  userId String
-  updatedAt DateTime @updatedAt
-  archived DateTime?
+  todoObjects Todo[]
   tags Tag[]
 }
 
 model Todo {
   id String @id @default(uuid())
+  title String
+  todos Item[]
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  updatedAt DateTime @updatedAt
+  archived DateTime?
+  tags Tag[]
+  @@unique([id, userId])
+}
+
+model Item {
+  id String @id @default(uuid())
   content String
-  todoObject TodoObject @relation(fields: [todoObjectId], references: [id])
+  todoObject Todo @relation(fields: [todoObjectId], references: [id])
   todoObjectId String
   done Boolean @default(false)
 }
@@ -41,7 +42,7 @@ model Todo {
 model Tag {
   id String @id @default(uuid())
   name String
-  todoObject TodoObject? @relation(fields: [todoObjectId], references: [id])
+  todoObject Todo? @relation(fields: [todoObjectId], references: [id])
   todoObjectId String?
   user User @relation(fields: [userId], references: [id])
   userId String

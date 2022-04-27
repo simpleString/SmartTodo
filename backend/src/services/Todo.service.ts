@@ -1,32 +1,45 @@
 import { Prisma, PrismaClient, Tag } from "@prisma/client";
 import {
   TagResponseDto,
-  TodoObjectDtoWithUser,
-  TodoObjectResponseDtoWithUser,
+  TodoDto,
+  TodoResponseDtoWithUser,
 } from "../dtos/todos.dto";
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  log: [
+    {
+      emit: "event",
+      level: "query",
+    },
+  ],
+});
+
+prisma.$on("query", async (e) => {
+  console.log(`${e.query} ${e.params}`);
+});
 
 class TodoObjectService {
-  public async getAllTodoObjects(userId: string) {
-    const data = await prisma.todoObject.findMany({ where: { userId } });
-    console.log(data);
-    return data;
-  }
-
-  public async getTodoObjectById(userId: string, todoObjectId: string) {
-    return await prisma.todoObject.findFirst({
-      where: { userId, id: todoObjectId },
+  public async getAllTodos(userId: string) {
+    return prisma.todo.findMany({
+      where: { userId },
+      include: { tags: true },
     });
   }
 
-  public async createTodoObject(todoObject: TodoObjectDtoWithUser) {
-    return await prisma.todoObject.create({
-      data: { title: todoObject.title, userId: todoObject.userId },
+  public async getTodoById(userId: string, todoId: string) {
+    return prisma.todo.findFirst({
+      where: { userId, id: todoId },
+      include: { tags: true },
     });
   }
 
-  public async updateTodoObject(todoObject: TodoObjectResponseDtoWithUser) {
+  public async createTodoObject(todoObject: TodoDto, userId: string) {
+    return await prisma.todo.create({
+      data: { title: todoObject.title, userId },
+    });
+  }
+
+  public async updateTodoObject(todoObject: TodoResponseDtoWithUser) {
     let tagList: Tag[] = [];
     // let todoList: Todo[] = [];
     if (todoObject.tags)
@@ -39,7 +52,7 @@ class TodoObjectService {
         })
       );
 
-    const newTodoObject = await prisma.todoObject.update({
+    const newTodoObject = await prisma.todo.update({
       data: {
         title: todoObject.title,
         archived: todoObject.achived,
@@ -48,34 +61,40 @@ class TodoObjectService {
       where: { id: todoObject.id },
     });
 
-    if (todoObject.todos)
-      await Promise.all(
-        todoObject.todos.map(async (todo) => {
-          return await this.createTodo({
-            content: todo.content,
-            todoObjectId: newTodoObject.id,
-            done: todo.done,
-          });
-        })
-      );
+    // if (todoObject.todos)
+    // await Promise.all(
+    //   todoObject.todos.map(async (todo) => {
+    //     return await this.createItem({
+    //       content: todo.content,
+    //       todoObjectId: newTodoObject.id,
+    //       done: todo.done,
+    //     });
+    //   })
+    // );
     return newTodoObject;
   }
 
-  public async deleteTodoObject() {}
-
-  public async getTodoById() {}
-
-  public async getAllTodos() {}
-
-  public async createTodo(todo: Prisma.TodoCreateManyInput) {
-    return await prisma.todo.create({
-      data: { content: todo.content, todoObjectId: todo.todoObjectId },
+  public async deleteTodo(id: string, userId: string) {
+    console.log("hello");
+    return prisma.todo.delete({
+      where: { id_userId: { id, userId } },
+      include: { tags: true },
     });
   }
 
-  public async updateTodo() {}
+  public async getItemById() {}
 
-  public async deleteTodo() {}
+  public async getAllItems() {}
+
+  public async createItem(todo: Prisma.TodoCreateManyInput) {
+    // return await prisma.todo.create({
+    //   data: { content: todo.content, todoObjectId: todo.todoObjectId },
+    // });
+  }
+
+  public async updateItem() {}
+
+  public async deleteItem() {}
 
   public async createTag(tag: Prisma.TagCreateManyInput) {
     return await prisma.tag.create({ data: tag });
