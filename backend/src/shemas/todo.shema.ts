@@ -2,25 +2,23 @@ import { Type } from "@sinclair/typebox";
 
 export const TagShema = Type.Object({
   name: Type.String(),
-  objectId: Type.Optional(Type.String({ format: "uuid" })),
+  todoId: Type.Optional(Type.String({ format: "uuid" })),
 });
-
-export const TagResponseShema = Type.Object({
-  id: Type.String(),
-  name: Type.String(),
-});
-
-export const TagResponseShemaArray = Type.Array(TagResponseShema);
 
 export const ItemShema = Type.Object({
   content: Type.String(),
   done: Type.Boolean({ default: false }),
 });
 
+export const ItemResponseShema = Type.Object({
+  id: Type.String({ format: "uuid" }),
+  content: Type.String(),
+  done: Type.Boolean({ default: false }),
+  todoId: Type.String({ format: "uuid" }),
+});
+
 export const TodoShema = Type.Object({
   title: Type.String(),
-  // todos: Type.Optional(Type.Array(ItemShema)),
-  // tags: Type.Optional(Type.Array(TagShema)),
 });
 
 export const TodoResponseShema = Type.Object({
@@ -28,9 +26,21 @@ export const TodoResponseShema = Type.Object({
   title: Type.String(),
   updatedAt: Type.String({ format: "date-time" }),
   achived: Type.Optional(Type.String({ format: "date-time" })),
-  tags: Type.Array(Type.Object({ id: Type.String(), name: Type.String() })),
+  tags: Type.Optional(
+    Type.Array(Type.Object({ id: Type.String(), name: Type.String() }))
+  ),
 });
 
+export const TagResponseShema = Type.Object({
+  id: Type.String({ format: "uuid" }),
+  name: Type.String(),
+  objectId: Type.Optional(Type.Array(Type.String({ format: "uuid" }))),
+  todos: Type.Optional(Type.Array(TodoResponseShema)),
+});
+
+export const TagResponseShemaArray = Type.Array(TagResponseShema);
+
 export const TodoResponseShemaArray = Type.Array(TodoResponseShema);
+export const ItemResponseShemaArray = Type.Array(ItemResponseShema);
 
 export const TodoShemaArray = Type.Array(TodoShema);

@@ -3,13 +3,9 @@ import { ParamsIdDto } from "../../dtos/common.dto";
 import { TagDto } from "../../dtos/todos.dto";
 import todoService from "../../services/Todo.service";
 import { ParamsIdShema } from "../../shemas/common.shema";
-import {
-  TagResponseShema,
-  TagResponseShemaArray,
-  TagShema,
-} from "../../shemas/todo.shema";
+import { TagResponseShema, TagShema } from "../../shemas/todo.shema";
 
-const tags: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+const items: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   fastify.addHook("onRequest", async (request, reply) => {
     try {
       await request.jwtVerify();
@@ -18,30 +14,20 @@ const tags: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   });
 
-  fastify.get(
-    "/",
-    { schema: { response: { 200: TagResponseShemaArray }, tags: ["tags"] } }, //FIXME
-    async (request, reply) => {
-      return todoService.getAllTags(request.user.id);
-    }
-  );
-
   fastify.post<{ Body: TagDto }>(
     "/",
     {
       schema: {
         body: TagShema,
-        response: { 200: TagResponseShema },
+        response: { 202: TagResponseShema },
         tags: ["tags"],
       },
     },
     async (request, reply) => {
-      return todoService.createTag(
-        {
-          ...request.body,
-        },
-        request.user.id
-      );
+      //   return todoService.createTag({
+      //     userId: request.user.id,
+      //     ...request.body,
+      //   });
     }
   );
 
@@ -70,7 +56,7 @@ const tags: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       },
     },
     async (request, reply) => {
-      return todoService.updateTag(request.body, request.params.id);
+      //   return todoService.updateTag(request.body, request.params.id);
     }
   );
 
@@ -89,4 +75,4 @@ const tags: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   );
 };
 
-export default tags;
+export default items;

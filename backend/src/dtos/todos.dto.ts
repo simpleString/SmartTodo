@@ -4,6 +4,7 @@ import {
   TagResponseShema,
   TodoShema,
   TodoResponseShema,
+  ItemShema,
 } from "../shemas/todo.shema";
 
 export type TodoDtoWithUser = TodoDto & { userId: string };
@@ -15,5 +16,7 @@ export type TodoResponseDto = Static<typeof TodoResponseShema>;
 
 export type TodoDto = Static<typeof TodoShema>;
 export type TagDto = Static<typeof TagShema>;
+
+export type ItemDto = Static<typeof ItemShema>;
 
 export type TagResponseDto = Static<typeof TagResponseShema>;

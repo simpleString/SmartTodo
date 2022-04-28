@@ -15,14 +15,14 @@ model User {
   id String @id @default(uuid())
   username String @unique
   password String
-  todoObjects Todo[]
+  todos Todo[]
   tags Tag[]
 }
 
 model Todo {
   id String @id @default(uuid())
   title String
-  todos Item[]
+  items Item[]
   user User @relation(fields: [userId], references: [id])
   userId String
   updatedAt DateTime @updatedAt
@@ -34,16 +34,15 @@ model Todo {
 model Item {
   id String @id @default(uuid())
   content String
-  todoObject Todo @relation(fields: [todoObjectId], references: [id])
-  todoObjectId String
+  todo Todo @relation(fields: [todoId], references: [id])
+  todoId String
   done Boolean @default(false)
 }
 
 model Tag {
   id String @id @default(uuid())
   name String
-  todoObject Todo? @relation(fields: [todoObjectId], references: [id])
-  todoObjectId String?
+  todos Todo[]
   user User @relation(fields: [userId], references: [id])
   userId String
   @@unique([name, userId])
