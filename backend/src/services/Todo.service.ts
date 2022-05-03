@@ -1,5 +1,12 @@
 import { PrismaClient } from "@prisma/client";
-import { ItemDto, TagDto, TodoDto } from "../dtos/todos.dto";
+import { TagResponseDto } from "../dtos/tags.dto";
+import {
+  ItemDto,
+  ItemResponseDto,
+  TagDto,
+  TodoDto,
+  TodoResponseDto,
+} from "../dtos/todos.dto";
 
 const prisma = new PrismaClient({
   log: [
@@ -15,7 +22,7 @@ prisma.$on("query", async (e) => {
 });
 
 class TodoObjectService {
-  public async getAllTodos(userId: string) {
+  public async getAllTodos(userId: string): Promise<TodoResponseDto[]> {
     return prisma.todo.findMany({
       where: { userId },
       include: { tags: true },
@@ -29,13 +36,20 @@ class TodoObjectService {
     });
   }
 
-  public async createTodo(todoObject: TodoDto, userId: string) {
+  public async createTodo(
+    todoObject: TodoDto,
+    userId: string
+  ): Promise<TodoResponseDto> {
     return await prisma.todo.create({
       data: { title: todoObject.title, userId },
+      include: { tags: true },
     });
   }
 
-  public async deleteTodo(id: string, userId: string) {
+  public async deleteTodo(
+    id: string,
+    userId: string
+  ): Promise<TodoResponseDto> {
     return prisma.todo.delete({
       where: { id_userId: { id, userId } },
       include: { tags: true },
@@ -52,7 +66,7 @@ class TodoObjectService {
 
   public async getItemById() {}
 
-  public async getAllItems(todoId: string) {
+  public async getAllItems(todoId: string): Promise<ItemResponseDto[]> {
     return prisma.item.findMany({ where: { todoId } });
   }
 
@@ -62,7 +76,9 @@ class TodoObjectService {
 
   public async updateItem() {}
 
-  public async deleteItem() {}
+  public async deleteItemFromTodo(itemId: string) {
+    return prisma.item.delete({ where: { id: itemId } });
+  }
 
   public async createTag(tag: TagDto, userId: string) {
     if (tag.todoId)
@@ -74,25 +90,44 @@ class TodoObjectService {
           },
           userId,
         },
+        include: { todos: { select: { id: true } } },
       });
     return prisma.tag.create({
       data: {
         name: tag.name,
         userId,
       },
+      include: { todos: { select: { id: true } } },
     });
   }
 
   public async deleteTag(tagId: string) {
-    return prisma.tag.delete({ where: { id: tagId } });
+    return prisma.tag.delete({
+      where: { id: tagId },
+      include: { todos: { select: { id: true } } },
+    });
+  }
+
+  public async deleteTagFromTodo(
+    tagId: string,
+    todoId: string,
+    userId: string
+  ) {
+    return prisma.tag.update({
+      where: { id: tagId },
+      data: { todos: { disconnect: { id_userId: { id: todoId, userId } } } },
+    });
   }
 
   public async updateTag(tag: TagDto, tagId: string) {
     return prisma.tag.update({ data: tag, where: { id: tagId } });
   }
 
-  public async getAllTags(userId: string) {
-    return prisma.tag.findMany({ where: { userId }, include: { todos: true } });
+  public async getAllTags(userId: string): Promise<TagResponseDto[]> {
+    return prisma.tag.findMany({
+      where: { userId },
+      include: { todos: { select: { id: true } } },
+    });
   }
 
   public async getAllTagsForTodo(userId: string, todoId: string) {
